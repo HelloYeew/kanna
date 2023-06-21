@@ -1,14 +1,15 @@
 ﻿using Kanna.Framework;
 
-namespace Kanna.Desktop;
-
-public class Program
+namespace Kanna.Desktop
 {
-    public static void Main(string[] args)
+    public abstract class Program
     {
-        using (var game = new Game(800, 600))
+        public static void Main(string[] args)
         {
-            game.Run();
+            using (var game = new Game(800, 600))
+            {
+                game.Run();
+            }
         }
     }
 }
