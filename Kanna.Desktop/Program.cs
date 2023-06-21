@@ -6,7 +6,7 @@ namespace Kanna.Desktop
     {
         public static void Main(string[] args)
         {
-            using (var game = new Game(800, 600))
+            using (var game = new Game())
             {
                 game.Run();
             }
