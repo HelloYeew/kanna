@@ -1,17 +1,20 @@
 ﻿using System.Reflection;
-using ManagedBass;
+using Kanna.Framework.Audio;
+using Kanna.Framework.Logging;
 using OpenTK.Windowing.Desktop;
 
 namespace Kanna.Framework
 {
     public class Game : GameWindow
     {
-        public Game( int width = 1366, int height = 768, string title = "Kanna Framework") : base(GameWindowSettings.Default,
+        public Game( int width = 1366, int height = 768, string title = "") : base(GameWindowSettings.Default,
             new NativeWindowSettings() {Size = (width, height), Title = title})
         {
-            Bass.Init();
-            Title = "Kanna Framework (Running " + Assembly.GetEntryAssembly()?.GetName().Name + ")";
-            Console.WriteLine("Initialized Bass version " + Bass.Version + " with device " + Bass.CurrentDevice);
+            if (title == "")
+                Title = "Kanna Framework (Running " + Assembly.GetEntryAssembly()?.GetName().Name + ")";
+
+            Logger.AddHeader();
+            AudioManager.InitBass();
         }
     }
 }
