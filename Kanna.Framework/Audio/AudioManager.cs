@@ -13,19 +13,24 @@ namespace Kanna.Framework.Audio
         public static void InitBass()
         {
             // Reduce latency
-            Bass.DeviceBufferLength = 10;
-            Bass.PlaybackBufferLength = 100;
+            // Bass.DeviceBufferLength = 10;
+            // Bass.PlaybackBufferLength = 100;
+            //
+            // Bass.DeviceNonStop = true;
 
-            Bass.DeviceNonStop = true;
+            // Bass.Configure((ManagedBass.Configuration)70, false);
 
-            Bass.Configure((ManagedBass.Configuration)70, false);
-
-            Bass.Init();
-
-            Logger.Log("BASS Initialized.");
-            Logger.Log($"BASS Version: {Bass.Version}");
-            Logger.Log($"BASS FX Version: {BassFx.Version}");
-            Logger.Log($"BASS Mix Version: {BassMix.Version}");
+            if (!Bass.Init())
+            {
+                Logger.Log("Cannot initialize BASS");
+            }
+            else
+            {
+                Logger.Log("BASS Initialized.");
+                Logger.Log($"BASS Version: {Bass.Version}");
+                Logger.Log($"BASS FX Version: {BassFx.Version}");
+                Logger.Log($"BASS Mix Version: {BassMix.Version}");
+            }
         }
     }
 }
