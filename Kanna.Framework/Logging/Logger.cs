@@ -7,7 +7,7 @@ namespace Kanna.Framework.Logging
     {
         public static string User = Environment.UserName;
 
-        private static void log(string message, LoggingTarget target = LoggingTarget.Runtime, LogLevel level = LogLevel.Verbose)
+        private static void log(string message, LoggingTarget target = LoggingTarget.Runtime, LogLevel level = LogLevel.Verbose, bool print = true, bool save = true)
         {
 #if !DEBUG
             if (level <= LogLevel.Debug) return;
@@ -21,7 +21,9 @@ namespace Kanna.Framework.Logging
 
             foreach (string line in lines)
             {
-                Console.WriteLine(line);
+                // TODO: Save to file
+                if (print)
+                    Console.WriteLine(line);
             }
         }
 
@@ -46,6 +48,17 @@ namespace Kanna.Framework.Logging
             log($@"Running {Assembly.GetEntryAssembly()?.GetName().Name} on .NET {Environment.Version} using Kanna Framework version {Assembly.GetExecutingAssembly().GetName().Version}");
             log($@"Environment : {Environment.OSVersion.Platform} {Environment.OSVersion.Version}, {Environment.ProcessorCount} cores ({(Environment.Is64BitProcess ? "64" : "32")}bit process)");
             log($@"----------------------------------------------");
+        }
+
+        /// <summary>
+        /// Only print the log to console.
+        /// </summary>
+        /// <param name="message">The message to log. Can include newline (\n) characters to split into multiple lines.</param>
+        /// <param name="level">The log level to use.</param>
+        /// <param name="target">The target to log to.</param>
+        public static void LogPrint(string message, LoggingTarget target = LoggingTarget.Runtime, LogLevel level = LogLevel.Verbose)
+        {
+            log(message, target, level, true, false);
         }
     }
 }
