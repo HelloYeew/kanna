@@ -2,8 +2,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kanna.Framework", "Kanna.Framework\Kanna.Framework.csproj", "{79F8D279-82FC-4E42-8FDD-C48180A7DABD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kanna.Desktop", "Kanna.Desktop\Kanna.Desktop.csproj", "{87D616A6-732D-4FD9-BB6A-F1D846BAB946}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -14,9 +12,5 @@ Global
 		{79F8D279-82FC-4E42-8FDD-C48180A7DABD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79F8D279-82FC-4E42-8FDD-C48180A7DABD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79F8D279-82FC-4E42-8FDD-C48180A7DABD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{87D616A6-732D-4FD9-BB6A-F1D846BAB946}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{87D616A6-732D-4FD9-BB6A-F1D846BAB946}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{87D616A6-732D-4FD9-BB6A-F1D846BAB946}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{87D616A6-732D-4FD9-BB6A-F1D846BAB946}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
