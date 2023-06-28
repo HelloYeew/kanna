@@ -1,5 +1,7 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using Kanna.Framework.Audio;
+using Kanna.Framework.Graphics;
 using Kanna.Framework.Logging;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
@@ -11,10 +13,30 @@ namespace Kanna.Framework
 {
     public class Game : GameWindow
     {
+        private readonly float[] _vertices = {
+            // positions        // colors
+            0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
+            -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
+            0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top
+        };
+
+        private uint[] _indices =
+        {
+            // Note that indices start at 0!
+            0, 1, 3, // The first triangle will be the top-right half of the triangle
+            1, 2, 3 // Then the second will be the bottom-left half of the triangle
+        };
+
         public FPSMode FpsMode = FPSMode.DoubleMultiplier;
 
         // TODO: This should be reflect the real monitor refresh rate
         public int MonitorRefreshRate = 120;
+
+        private int _vertexBuffer, _vertexArray, _elementBuffer;
+
+        private Shader _shapeShader;
+
+        private Stopwatch _timer;
 
         public Game( int width = 1366, int height = 768, string title = "") : base(GameWindowSettings.Default,
             new NativeWindowSettings() {Size = (width, height), Title = title})
@@ -31,6 +53,27 @@ namespace Kanna.Framework
             base.OnLoad();
 
             GL.ClearColor(Color4.MediumPurple);
+
+            _vertexBuffer = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer);
+            GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
+
+            _vertexArray = GL.GenVertexArray();
+            GL.BindVertexArray(_vertexArray);
+
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
+            GL.EnableVertexAttribArray(0);
+
+            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
+            GL.EnableVertexAttribArray(1);
+
+            _elementBuffer = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBuffer);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsageHint.StaticDraw);
+
+            _shapeShader = new Shader("Resources/Shaders/sh_shape.vert", "Resources/Shaders/sh_shape.frag");
+            _shapeShader.Use();
+
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
@@ -38,6 +81,11 @@ namespace Kanna.Framework
             base.OnRenderFrame(args);
 
             GL.Clear(ClearBufferMask.ColorBufferBit);
+
+            _shapeShader.Use();
+
+            GL.BindVertexArray(_vertexArray);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
 
             SwapBuffers();
         }
