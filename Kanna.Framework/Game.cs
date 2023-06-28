@@ -42,6 +42,12 @@ namespace Kanna.Framework
             SwapBuffers();
         }
 
+        protected override void OnResize(ResizeEventArgs e)
+        {
+            base.OnResize(e);
+            GL.Viewport(0, 0, e.Width, e.Height);
+        }
+
         protected override void OnKeyDown(KeyboardKeyEventArgs e)
         {
             base.OnKeyDown(e);
