@@ -11,6 +11,11 @@ namespace Kanna.Framework
 {
     public class Game : GameWindow
     {
+        public FPSMode FpsMode = FPSMode.DoubleMultiplier;
+
+        // TODO: This should be reflect the real monitor refresh rate
+        public int MonitorRefreshRate = 120;
+
         public Game( int width = 1366, int height = 768, string title = "") : base(GameWindowSettings.Default,
             new NativeWindowSettings() {Size = (width, height), Title = title})
         {
@@ -55,11 +60,37 @@ namespace Kanna.Framework
             // TODO: Add more FPS options
             if (e is {Control: true, Key: Keys.F12})
             {
-                if (VSync == VSyncMode.On)
-                    VSync = VSyncMode.Off;
-                else
-                    VSync = VSyncMode.On;
-                Logger.Log($"VSync changed to {VSync} ({ClientSize.X}x{ClientSize.Y})");
+                switch (FpsMode)
+                {
+                    case FPSMode.DoubleMultiplier:
+                        FpsMode = FPSMode.FourMultiplier;
+                        UpdateFrequency = MonitorRefreshRate * 4;
+                        break;
+
+                    case FPSMode.FourMultiplier:
+                        FpsMode = FPSMode.EightMultiplier;
+                        UpdateFrequency = MonitorRefreshRate * 8;
+                        break;
+
+                    case FPSMode.EightMultiplier:
+                        FpsMode = FPSMode.Unlimited;
+                        UpdateFrequency = 0;
+                        break;
+
+                    case FPSMode.Unlimited:
+                        FpsMode = FPSMode.VSync;
+                        UpdateFrequency = MonitorRefreshRate;
+                        VSync = VSyncMode.On;
+                        break;
+
+                    case FPSMode.VSync:
+                        FpsMode = FPSMode.DoubleMultiplier;
+                        UpdateFrequency = MonitorRefreshRate * 2;
+                        VSync = VSyncMode.Off;
+                        break;
+                }
+
+                Logger.Log($"FPS Mode changed to {FpsMode}");
             }
         }
 
@@ -68,11 +99,31 @@ namespace Kanna.Framework
             base.OnFocusedChanged(e);
 
             if (e.IsFocused)
-                // Don't limit FPS when focused
-                UpdateFrequency = 0;
+                switch (FpsMode)
+                {
+                    case FPSMode.DoubleMultiplier:
+                        UpdateFrequency = MonitorRefreshRate * 2;
+                        break;
+
+                    case FPSMode.FourMultiplier:
+                        UpdateFrequency = MonitorRefreshRate * 4;
+                        break;
+
+                    case FPSMode.EightMultiplier:
+                        UpdateFrequency = MonitorRefreshRate * 8;
+                        break;
+
+                    case FPSMode.Unlimited:
+                        UpdateFrequency = 0;
+                        break;
+
+                    case FPSMode.VSync:
+                        UpdateFrequency = MonitorRefreshRate;
+                        break;
+                }
             else
-                // Limit FPS to 60 when not focused
-                UpdateFrequency = 60;
+                // Limit FPS to monitor refresh rate
+                UpdateFrequency = MonitorRefreshRate;
         }
     }
 }
