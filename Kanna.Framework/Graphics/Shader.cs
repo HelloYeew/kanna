@@ -1,4 +1,6 @@
-﻿using Kanna.Framework.Logging;
+﻿using System.Diagnostics;
+using System.Reflection;
+using Kanna.Framework.Logging;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
@@ -14,6 +16,17 @@ namespace Kanna.Framework.Graphics
 
         public Shader(string vertexPath, string fragmentPath)
         {
+            string? assemblyFolderPath = Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location);
+            if (!File.Exists(vertexPath))
+            {
+                Debug.Assert(assemblyFolderPath != null, nameof(assemblyFolderPath) + " != null");
+                vertexPath = Path.Combine(assemblyFolderPath, vertexPath);
+            }
+            if (!File.Exists(fragmentPath))
+            {
+                Debug.Assert(assemblyFolderPath != null, nameof(assemblyFolderPath) + " != null");
+                fragmentPath = Path.Combine(assemblyFolderPath, fragmentPath);
+            }
             string VertexShaderSource = File.ReadAllText(vertexPath);
             string FragmentShaderSource = File.ReadAllText(fragmentPath);
             var VertexShader = GL.CreateShader(ShaderType.VertexShader);
