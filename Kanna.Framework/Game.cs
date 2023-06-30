@@ -13,18 +13,11 @@ namespace Kanna.Framework
 {
     public class Game : GameWindow
     {
-        private readonly float[] _vertices = {
-            // positions        // colors
-            0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
-            -0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom left
-            0.5f,  0.0f, 0.0f,  1.0f, 0.0f, 0.0f    // top
-        };
-
-        private uint[] _indices =
+        private readonly float[] _vertices =
         {
-            // Note that indices start at 0!
-            0, 1, 3, // The first triangle will be the top-right half of the triangle
-            1, 2, 3 // Then the second will be the bottom-left half of the triangle
+            -0.5f, -0.5f, 0.0f, // Bottom-left vertex
+            0.5f, -0.5f, 0.0f, // Bottom-right vertex
+            0.0f,  0.5f, 0.0f  // Top vertex
         };
 
         public FPSMode FpsMode = FPSMode.DoubleMultiplier;
@@ -61,19 +54,14 @@ namespace Kanna.Framework
             _vertexArray = GL.GenVertexArray();
             GL.BindVertexArray(_vertexArray);
 
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
             GL.EnableVertexAttribArray(0);
 
-            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
-            GL.EnableVertexAttribArray(1);
-
-            _elementBuffer = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBuffer);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsageHint.StaticDraw);
+            GL.GetInteger(GetPName.MaxVertexAttribs, out int maxAttributeCount);
+            Logger.Log($"Max Vertex Attributes: {maxAttributeCount}");
 
             _shapeShader = new Shader("Resources/Shaders/sh_shape.vert", "Resources/Shaders/sh_shape.frag");
             _shapeShader.Use();
-
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
@@ -84,7 +72,13 @@ namespace Kanna.Framework
 
             _shapeShader.Use();
 
+            int vertexColorLocation = GL.GetUniformLocation(_shapeShader.Handle, "colorVar");
+
+            // Random float between 0.0f and 1.0f;
+            GL.Uniform4(vertexColorLocation, 0.0f, 1.0f, 0.5f, 1.0f);
+
             GL.BindVertexArray(_vertexArray);
+
             GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
 
             SwapBuffers();
