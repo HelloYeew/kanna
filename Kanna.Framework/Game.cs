@@ -20,12 +20,20 @@ namespace Kanna.Framework
             0.0f,  0.5f, 0.0f  // Top vertex
         };
 
+        private readonly float[] _vertices2 =
+        {
+            -0.25f, -0.25f, 0.5f, // Bottom-left vertex
+            0.25f, -0.25f, 0.5f, // Bottom-right vertex
+            0.5f,  0.25f, 0.5f  // Top vertex
+        };
+
+
         public FPSMode FpsMode = FPSMode.DoubleMultiplier;
 
         // TODO: This should be reflect the real monitor refresh rate
         public int MonitorRefreshRate = 120;
 
-        private int _vertexBuffer, _vertexArray, _elementBuffer;
+        private uint[] _vertexBuffer, _vertexArray, _elementBuffer;
 
         private Shader _shapeShader;
 
@@ -47,18 +55,25 @@ namespace Kanna.Framework
 
             GL.ClearColor(Color4.MediumPurple);
 
-            _vertexBuffer = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer);
+            _vertexArray = new uint[2];
+            _vertexBuffer = new uint[2];
+            GL.GenVertexArrays(2, _vertexArray);
+            GL.GenBuffers(2, _vertexBuffer);
+
+            GL.BindVertexArray(_vertexArray[0]);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer[0]);
             GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
-
-            _vertexArray = GL.GenVertexArray();
-            GL.BindVertexArray(_vertexArray);
-
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
             GL.EnableVertexAttribArray(0);
 
-            GL.GetInteger(GetPName.MaxVertexAttribs, out int maxAttributeCount);
-            Logger.Log($"Max Vertex Attributes: {maxAttributeCount}");
+            GL.BindVertexArray(_vertexArray[1]);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer[1]);
+            GL.BufferData(BufferTarget.ArrayBuffer, _vertices2.Length * sizeof(float), _vertices2, BufferUsageHint.StaticDraw);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+            GL.EnableVertexAttribArray(0);
+
+            // Unbind every VAO for safety
+            GL.BindVertexArray(0);
 
             _shapeShader = new Shader("Resources/Shaders/sh_shape.vert", "Resources/Shaders/sh_shape.frag");
             _shapeShader.Use();
@@ -73,12 +88,14 @@ namespace Kanna.Framework
             _shapeShader.Use();
 
             int vertexColorLocation = GL.GetUniformLocation(_shapeShader.Handle, "colorVar");
-
-            // Random float between 0.0f and 1.0f;
             GL.Uniform4(vertexColorLocation, 0.0f, 1.0f, 0.5f, 1.0f);
 
-            GL.BindVertexArray(_vertexArray);
+            GL.BindVertexArray(_vertexArray[0]);
+            GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
 
+            GL.Uniform4(vertexColorLocation, 1.0f, 1.0f, 0.5f, 1.0f);
+
+            GL.BindVertexArray(_vertexArray[1]);
             GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
 
             SwapBuffers();
