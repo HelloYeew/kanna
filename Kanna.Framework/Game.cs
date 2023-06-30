@@ -15,9 +15,16 @@ namespace Kanna.Framework
     {
         private readonly float[] _vertices =
         {
-            -0.5f, -0.5f, 0.0f, // Bottom-left vertex
-            0.5f, -0.5f, 0.0f, // Bottom-right vertex
-            0.0f,  0.5f, 0.0f  // Top vertex
+            0.5f,  0.5f, 0.0f, // top right
+            0.5f, -0.5f, 0.0f, // bottom right
+            -0.5f, -0.5f, 0.0f, // bottom left
+            -0.5f,  0.5f, 0.0f, // top left
+        };
+
+        private readonly uint[] _indices =
+        {
+            0, 1, 3,
+            1, 2, 3
         };
 
         public FPSMode FpsMode = FPSMode.DoubleMultiplier;
@@ -57,8 +64,9 @@ namespace Kanna.Framework
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
             GL.EnableVertexAttribArray(0);
 
-            GL.GetInteger(GetPName.MaxVertexAttribs, out int maxAttributeCount);
-            Logger.Log($"Max Vertex Attributes: {maxAttributeCount}");
+            _elementBuffer = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBuffer);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsageHint.StaticDraw);
 
             _shapeShader = new Shader("Resources/Shaders/sh_shape.vert", "Resources/Shaders/sh_shape.frag");
             _shapeShader.Use();
@@ -74,12 +82,11 @@ namespace Kanna.Framework
 
             int vertexColorLocation = GL.GetUniformLocation(_shapeShader.Handle, "colorVar");
 
-            // Random float between 0.0f and 1.0f;
             GL.Uniform4(vertexColorLocation, 0.0f, 1.0f, 0.5f, 1.0f);
 
             GL.BindVertexArray(_vertexArray);
 
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
+            GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
 
             SwapBuffers();
         }
