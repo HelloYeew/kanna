@@ -37,5 +37,22 @@ namespace Kanna.Framework.Audio
         {
             Bass.ChannelFlags(fileStream, BassFlags.Loop, BassFlags.Loop);
         }
+
+        /// <summary>
+        /// Stop the track
+        /// </summary>
+        public void Stop()
+        {
+            Bass.ChannelStop(fileStream);
+        }
+
+        /// <summary>
+        /// Get the amplitude of the track
+        /// </summary>
+        /// <returns>Current amplitude of the track from 0 to 1</returns>
+        public int Amplitude()
+        {
+            return (int) (Bass.ChannelGetLevel(fileStream) / 32768f);
+        }
     }
 }
