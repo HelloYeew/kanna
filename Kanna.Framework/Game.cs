@@ -13,33 +13,22 @@ namespace Kanna.Framework
 {
     public class Game : GameWindow
     {
-        private readonly float[] _vertices =
-        {
-            -0.5f, -0.5f, 0.0f, // Bottom-left vertex
-            0.5f, -0.5f, 0.0f, // Bottom-right vertex
-            0.0f,  0.5f, 0.0f  // Top vertex
-        };
+        private List<float> verticesList = new List<float>();
 
-        private readonly float[] _vertices2 =
-        {
-            -0.25f, -0.25f, 0.5f, // Bottom-left vertex
-            0.25f, -0.25f, 0.5f, // Bottom-right vertex
-            0.5f,  0.25f, 0.5f  // Top vertex
-        };
-
+        public List<IDrawable> Drawables = new List<IDrawable>();
 
         public FPSMode FpsMode = FPSMode.DoubleMultiplier;
 
         // TODO: This should be reflect the real monitor refresh rate
         public int MonitorRefreshRate = 120;
 
-        private uint[] _vertexBuffer, _vertexArray, _elementBuffer;
+        private uint[] vertexBuffer, vertexArray;
 
         private Shader _shapeShader;
 
         private Stopwatch _timer;
 
-        public Game( int width = 1366, int height = 768, string title = "") : base(GameWindowSettings.Default,
+        public Game(int width = 1366, int height = 768, string title = "") : base(GameWindowSettings.Default,
             new NativeWindowSettings() {Size = (width, height), Title = title})
         {
             if (title == "")
@@ -55,22 +44,19 @@ namespace Kanna.Framework
 
             GL.ClearColor(Color4.MediumPurple);
 
-            _vertexArray = new uint[2];
-            _vertexBuffer = new uint[2];
-            GL.GenVertexArrays(2, _vertexArray);
-            GL.GenBuffers(2, _vertexBuffer);
+            vertexArray = new uint[Drawables.Count];
+            vertexBuffer = new uint[Drawables.Count];
+            GL.GenVertexArrays(Drawables.Count, vertexArray);
+            GL.GenBuffers(Drawables.Count, vertexBuffer);
 
-            GL.BindVertexArray(_vertexArray[0]);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer[0]);
-            GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
-            GL.EnableVertexAttribArray(0);
-
-            GL.BindVertexArray(_vertexArray[1]);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBuffer[1]);
-            GL.BufferData(BufferTarget.ArrayBuffer, _vertices2.Length * sizeof(float), _vertices2, BufferUsageHint.StaticDraw);
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
-            GL.EnableVertexAttribArray(0);
+            for (int i = 0; i < Drawables.Count; i++)
+            {
+                GL.BindVertexArray(vertexArray[i]);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer[i]);
+                GL.BufferData(BufferTarget.ArrayBuffer, Drawables[i].Vertices.Length * sizeof(float), Drawables[i].Vertices, BufferUsageHint.StaticDraw);
+                GL.VertexAttribPointer(0, Drawables[i].Vertices.Length/3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+                GL.EnableVertexAttribArray(0);
+            }
 
             // Unbind every VAO for safety
             GL.BindVertexArray(0);
@@ -88,15 +74,14 @@ namespace Kanna.Framework
             _shapeShader.Use();
 
             int vertexColorLocation = GL.GetUniformLocation(_shapeShader.Handle, "colorVar");
-            GL.Uniform4(vertexColorLocation, 0.0f, 1.0f, 0.5f, 1.0f);
 
-            GL.BindVertexArray(_vertexArray[0]);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
+            for (int i = 0; i < Drawables.Count; i++)
+            {
+                GL.Uniform4(vertexColorLocation, Drawables[i].Color.R, Drawables[i].Color.G, Drawables[i].Color.B, Drawables[i].Color.A);
 
-            GL.Uniform4(vertexColorLocation, 1.0f, 1.0f, 0.5f, 1.0f);
-
-            GL.BindVertexArray(_vertexArray[1]);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
+                GL.BindVertexArray(vertexArray[i]);
+                GL.DrawArrays(PrimitiveType.Triangles, 0, Drawables[i].Vertices.Length/3);
+            }
 
             SwapBuffers();
         }
