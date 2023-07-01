@@ -12,13 +12,7 @@ namespace Kanna.Framework.Audio
         /// </summary>
         public static void InitBass()
         {
-            // Reduce latency
-            // Bass.DeviceBufferLength = 10;
-            // Bass.PlaybackBufferLength = 100;
-            //
-            // Bass.DeviceNonStop = true;
-
-            // Bass.Configure((ManagedBass.Configuration)70, false);
+            Bass.DeviceNonStop = true;
 
             if (!Bass.Init())
             {

@@ -6,11 +6,14 @@ using OpenTK.Mathematics;
 
 namespace Kanna.Framework.Graphics
 {
+    /// <summary>
+    /// Represents a shader.
+    /// </summary>
     public class Shader
     {
         public int Handle;
 
-        private readonly Dictionary<string, int> _uniformLocations;
+        private readonly Dictionary<string, int> uniformLocations;
 
         private bool disposedValue = false;
 
@@ -27,38 +30,38 @@ namespace Kanna.Framework.Graphics
                 Debug.Assert(assemblyFolderPath != null, nameof(assemblyFolderPath) + " != null");
                 fragmentPath = Path.Combine(assemblyFolderPath, fragmentPath);
             }
-            string VertexShaderSource = File.ReadAllText(vertexPath);
-            string FragmentShaderSource = File.ReadAllText(fragmentPath);
-            var VertexShader = GL.CreateShader(ShaderType.VertexShader);
-            GL.ShaderSource(VertexShader, VertexShaderSource);
-            var FragmentShader = GL.CreateShader(ShaderType.FragmentShader);
-            GL.ShaderSource(FragmentShader, FragmentShaderSource);
+            string vertexShaderSource = File.ReadAllText(vertexPath);
+            string fragmentShaderSource = File.ReadAllText(fragmentPath);
+            int vertexShader = GL.CreateShader(ShaderType.VertexShader);
+            GL.ShaderSource(vertexShader, vertexShaderSource);
+            int fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
+            GL.ShaderSource(fragmentShader, fragmentShaderSource);
 
 
             // Compile shaders
-            GL.CompileShader(VertexShader);
+            GL.CompileShader(vertexShader);
 
-            GL.GetShader(VertexShader, ShaderParameter.CompileStatus, out int success1);
+            GL.GetShader(vertexShader, ShaderParameter.CompileStatus, out int success1);
             if (success1 == 0)
             {
-                string infoLog = GL.GetShaderInfoLog(VertexShader);
+                string infoLog = GL.GetShaderInfoLog(vertexShader);
                 Console.WriteLine(infoLog);
             }
 
-            GL.CompileShader(FragmentShader);
+            GL.CompileShader(fragmentShader);
 
-            GL.GetShader(FragmentShader, ShaderParameter.CompileStatus, out int success2);
+            GL.GetShader(fragmentShader, ShaderParameter.CompileStatus, out int success2);
             if (success2 == 0)
             {
-                string infoLog = GL.GetShaderInfoLog(FragmentShader);
+                string infoLog = GL.GetShaderInfoLog(fragmentShader);
                 Console.WriteLine(infoLog);
             }
 
             // Create program
             Handle = GL.CreateProgram();
 
-            GL.AttachShader(Handle, VertexShader);
-            GL.AttachShader(Handle, FragmentShader);
+            GL.AttachShader(Handle, vertexShader);
+            GL.AttachShader(Handle, fragmentShader);
 
             GL.LinkProgram(Handle);
 
@@ -70,28 +73,28 @@ namespace Kanna.Framework.Graphics
             }
 
             // Cleanup
-            GL.DetachShader(Handle, VertexShader);
-            GL.DetachShader(Handle, FragmentShader);
-            GL.DeleteShader(FragmentShader);
-            GL.DeleteShader(VertexShader);
+            GL.DetachShader(Handle, vertexShader);
+            GL.DetachShader(Handle, fragmentShader);
+            GL.DeleteShader(fragmentShader);
+            GL.DeleteShader(vertexShader);
 
             // Get the number of active uniforms in the shader.
             GL.GetProgram(Handle, GetProgramParameterName.ActiveUniforms, out var numberOfUniforms);
 
             // Next, allocate the dictionary to hold the locations.
-            _uniformLocations = new Dictionary<string, int>();
+            uniformLocations = new Dictionary<string, int>();
 
             // Loop over all the uniforms,
-            for (var i = 0; i < numberOfUniforms; i++)
+            for (int i = 0; i < numberOfUniforms; i++)
             {
                 // get the name of this uniform,
-                var key = GL.GetActiveUniform(Handle, i, out _, out _);
+                string? key = GL.GetActiveUniform(Handle, i, out _, out _);
 
                 // get the location,
-                var location = GL.GetUniformLocation(Handle, key);
+                int location = GL.GetUniformLocation(Handle, key);
 
                 // and then add it to the dictionary.
-                _uniformLocations.Add(key, location);
+                uniformLocations.Add(key, location);
             }
         }
 
@@ -182,7 +185,7 @@ namespace Kanna.Framework.Graphics
         public void SetInt(string name, int data)
         {
             GL.UseProgram(Handle);
-            GL.Uniform1(_uniformLocations[name], data);
+            GL.Uniform1(uniformLocations[name], data);
         }
 
         /// <summary>
@@ -193,7 +196,7 @@ namespace Kanna.Framework.Graphics
         public void SetFloat(string name, float data)
         {
             GL.UseProgram(Handle);
-            GL.Uniform1(_uniformLocations[name], data);
+            GL.Uniform1(uniformLocations[name], data);
         }
 
         /// <summary>
@@ -209,7 +212,7 @@ namespace Kanna.Framework.Graphics
         public void SetMatrix4(string name, Matrix4 data)
         {
             GL.UseProgram(Handle);
-            GL.UniformMatrix4(_uniformLocations[name], true, ref data);
+            GL.UniformMatrix4(uniformLocations[name], true, ref data);
         }
 
         /// <summary>
@@ -220,7 +223,7 @@ namespace Kanna.Framework.Graphics
         public void SetVector3(string name, Vector3 data)
         {
             GL.UseProgram(Handle);
-            GL.Uniform3(_uniformLocations[name], data);
+            GL.Uniform3(uniformLocations[name], data);
         }
     }
 }
