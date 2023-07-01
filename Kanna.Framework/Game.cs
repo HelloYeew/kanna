@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Reflection;
+﻿using System.Reflection;
 using Kanna.Framework.Audio;
 using Kanna.Framework.Graphics;
 using Kanna.Framework.Logging;
@@ -13,8 +12,6 @@ namespace Kanna.Framework
 {
     public class Game : GameWindow
     {
-        private List<float> verticesList = new List<float>();
-
         public List<IDrawable> Drawables = new List<IDrawable>();
 
         public FPSMode FpsMode = FPSMode.DoubleMultiplier;
@@ -22,11 +19,10 @@ namespace Kanna.Framework
         // TODO: This should be reflect the real monitor refresh rate
         public int MonitorRefreshRate = 120;
 
-        private uint[] vertexBuffer, vertexArray;
+        private uint[] vertexBuffer = Array.Empty<uint>();
+        private uint[] vertexArray = Array.Empty<uint>();
 
-        private Shader _shapeShader;
-
-        private Stopwatch _timer;
+        private Shader? shapeShader;
 
         public Game(int width = 1366, int height = 768, string title = "") : base(GameWindowSettings.Default,
             new NativeWindowSettings() {Size = (width, height), Title = title})
@@ -61,8 +57,8 @@ namespace Kanna.Framework
             // Unbind every VAO for safety
             GL.BindVertexArray(0);
 
-            _shapeShader = new Shader("Resources/Shaders/sh_shape.vert", "Resources/Shaders/sh_shape.frag");
-            _shapeShader.Use();
+            shapeShader = new Shader("Resources/Shaders/sh_shape.vert", "Resources/Shaders/sh_shape.frag");
+            shapeShader.Use();
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
@@ -71,9 +67,9 @@ namespace Kanna.Framework
 
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
-            _shapeShader.Use();
+            shapeShader?.Use();
 
-            int vertexColorLocation = GL.GetUniformLocation(_shapeShader.Handle, "colorVar");
+            int vertexColorLocation = GL.GetUniformLocation(shapeShader.Handle, "colorVar");
 
             for (int i = 0; i < Drawables.Count; i++)
             {
