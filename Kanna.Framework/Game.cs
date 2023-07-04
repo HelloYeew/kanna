@@ -13,6 +13,7 @@ namespace Kanna.Framework
     public class Game : GameWindow
     {
         public List<IDrawable> Drawables = new List<IDrawable>();
+        private List<DrawableVertices> drawableVerticesList = new List<DrawableVertices>();
 
         public FPSMode FpsMode = FPSMode.DoubleMultiplier;
 
@@ -40,17 +41,29 @@ namespace Kanna.Framework
 
             GL.ClearColor(Color4.MediumPurple);
 
-            vertexArray = new uint[Drawables.Count];
-            vertexBuffer = new uint[Drawables.Count];
-            GL.GenVertexArrays(Drawables.Count, vertexArray);
-            GL.GenBuffers(Drawables.Count, vertexBuffer);
-
             for (int i = 0; i < Drawables.Count; i++)
+            {
+                for (int j = 0; j < Drawables[i].Vertices.Count; j++)
+                {
+                    drawableVerticesList.Add(new DrawableVertices
+                    {
+                        Drawable = Drawables[i],
+                        Vertices = Drawables[i].Vertices[j]
+                    });
+                }
+            }
+
+            vertexArray = new uint[drawableVerticesList.Count];
+            vertexBuffer = new uint[drawableVerticesList.Count];
+            GL.GenVertexArrays(drawableVerticesList.Count, vertexArray);
+            GL.GenBuffers(drawableVerticesList.Count, vertexBuffer);
+
+            for (int i = 0; i < drawableVerticesList.Count; i++)
             {
                 GL.BindVertexArray(vertexArray[i]);
                 GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer[i]);
-                GL.BufferData(BufferTarget.ArrayBuffer, Drawables[i].Vertices.Length * sizeof(float), Drawables[i].Vertices, BufferUsageHint.StaticDraw);
-                GL.VertexAttribPointer(0, Drawables[i].Vertices.Length/3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+                GL.BufferData(BufferTarget.ArrayBuffer, drawableVerticesList[i].Vertices.Length * sizeof(float), drawableVerticesList[i].Vertices, BufferUsageHint.StaticDraw);
+                GL.VertexAttribPointer(0, drawableVerticesList[i].Vertices.Length/3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
                 GL.EnableVertexAttribArray(0);
             }
 
@@ -71,12 +84,14 @@ namespace Kanna.Framework
 
             int vertexColorLocation = GL.GetUniformLocation(shapeShader.Handle, "colorVar");
 
-            for (int i = 0; i < Drawables.Count; i++)
+            int vertexArrayIndex = 0;
+            for (int i = 0; i < drawableVerticesList.Count; i++)
             {
-                GL.Uniform4(vertexColorLocation, Drawables[i].Color.R, Drawables[i].Color.G, Drawables[i].Color.B, Drawables[i].Color.A);
+                GL.Uniform4(vertexColorLocation, drawableVerticesList[i].Drawable.Color.R, drawableVerticesList[i].Drawable.Color.G, drawableVerticesList[i].Drawable.Color.B, drawableVerticesList[i].Drawable.Color.A);
 
-                GL.BindVertexArray(vertexArray[i]);
-                GL.DrawArrays(PrimitiveType.Triangles, 0, Drawables[i].Vertices.Length/3);
+                GL.BindVertexArray(vertexArray[vertexArrayIndex]);
+                vertexArrayIndex++;
+                GL.DrawArrays(PrimitiveType.Triangles, 0, drawableVerticesList[i].Vertices.Length/3);
             }
 
             SwapBuffers();
@@ -171,5 +186,11 @@ namespace Kanna.Framework
                 // Limit FPS to monitor refresh rate
                 UpdateFrequency = MonitorRefreshRate;
         }
+    }
+
+    internal class DrawableVertices
+    {
+        public float[] Vertices;
+        public IDrawable Drawable;
     }
 }
