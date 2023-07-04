@@ -2,6 +2,9 @@
 
 namespace Kanna.Framework.Graphics.Utility
 {
+    /// <summary>
+    /// Extension methods for <see cref="Color4"/> objects.
+    /// </summary>
     public class Color4Extensions
     {
         /// <summary>
