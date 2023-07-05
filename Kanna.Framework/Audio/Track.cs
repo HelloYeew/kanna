@@ -49,10 +49,10 @@ namespace Kanna.Framework.Audio
         /// <summary>
         /// Get the amplitude of the track
         /// </summary>
-        /// <returns>Current amplitude of the track from 0 to 1</returns>
-        public int Amplitude()
+        /// <returns>Current amplitude of the track that's divided by 32768 (max value of short)</returns>
+        public float Amplitude()
         {
-            return (int) (Bass.ChannelGetLevel(fileStream) / 32768f);
+            return Bass.ChannelGetLevel(fileStream) / 32768f;
         }
     }
 }
