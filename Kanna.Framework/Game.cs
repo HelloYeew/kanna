@@ -41,6 +41,25 @@ namespace Kanna.Framework
 
             GL.ClearColor(Color4.MediumPurple);
 
+            shapeShader = new Shader("Resources/Shaders/sh_shape.vert", "Resources/Shaders/sh_shape.frag");
+            shapeShader.Use();
+        }
+
+        protected override void OnRenderFrame(FrameEventArgs args)
+        {
+            base.OnRenderFrame(args);
+
+            GL.Clear(ClearBufferMask.ColorBufferBit);
+
+            // Clear all the previous vertex array and vertex buffer
+            GL.DeleteVertexArrays(vertexArray.Length, vertexArray);
+            GL.DeleteBuffers(vertexBuffer.Length, vertexBuffer);
+
+            vertexArray = Array.Empty<uint>();
+            vertexBuffer = Array.Empty<uint>();
+
+            drawableVerticesList.Clear();
+
             for (int i = 0; i < Drawables.Count; i++)
             {
                 for (int j = 0; j < Drawables[i].Vertices.Count; j++)
@@ -69,16 +88,6 @@ namespace Kanna.Framework
 
             // Unbind every VAO for safety
             GL.BindVertexArray(0);
-
-            shapeShader = new Shader("Resources/Shaders/sh_shape.vert", "Resources/Shaders/sh_shape.frag");
-            shapeShader.Use();
-        }
-
-        protected override void OnRenderFrame(FrameEventArgs args)
-        {
-            base.OnRenderFrame(args);
-
-            GL.Clear(ClearBufferMask.ColorBufferBit);
 
             shapeShader?.Use();
 
