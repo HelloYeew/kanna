@@ -11,7 +11,7 @@ namespace Kanna.Framework.Graphics
     /// </summary>
     public class Shader
     {
-        public int Handle;
+        private readonly int handle;
 
         private readonly Dictionary<string, int> uniformLocations;
 
@@ -58,28 +58,28 @@ namespace Kanna.Framework.Graphics
             }
 
             // Create program
-            Handle = GL.CreateProgram();
+            handle = GL.CreateProgram();
 
-            GL.AttachShader(Handle, vertexShader);
-            GL.AttachShader(Handle, fragmentShader);
+            GL.AttachShader(handle, vertexShader);
+            GL.AttachShader(handle, fragmentShader);
 
-            GL.LinkProgram(Handle);
+            GL.LinkProgram(handle);
 
-            GL.GetProgram(Handle, GetProgramParameterName.LinkStatus, out int success3);
+            GL.GetProgram(handle, GetProgramParameterName.LinkStatus, out int success3);
             if (success3 == 0)
             {
-                string infoLog = GL.GetProgramInfoLog(Handle);
+                string infoLog = GL.GetProgramInfoLog(handle);
                 Console.WriteLine(infoLog);
             }
 
             // Cleanup
-            GL.DetachShader(Handle, vertexShader);
-            GL.DetachShader(Handle, fragmentShader);
+            GL.DetachShader(handle, vertexShader);
+            GL.DetachShader(handle, fragmentShader);
             GL.DeleteShader(fragmentShader);
             GL.DeleteShader(vertexShader);
 
             // Get the number of active uniforms in the shader.
-            GL.GetProgram(Handle, GetProgramParameterName.ActiveUniforms, out var numberOfUniforms);
+            GL.GetProgram(handle, GetProgramParameterName.ActiveUniforms, out var numberOfUniforms);
 
             // Next, allocate the dictionary to hold the locations.
             uniformLocations = new Dictionary<string, int>();
@@ -88,10 +88,10 @@ namespace Kanna.Framework.Graphics
             for (int i = 0; i < numberOfUniforms; i++)
             {
                 // get the name of this uniform,
-                string? key = GL.GetActiveUniform(Handle, i, out _, out _);
+                string? key = GL.GetActiveUniform(handle, i, out _, out _);
 
                 // get the location,
-                int location = GL.GetUniformLocation(Handle, key);
+                int location = GL.GetUniformLocation(handle, key);
 
                 // and then add it to the dictionary.
                 uniformLocations.Add(key, location);
@@ -103,14 +103,14 @@ namespace Kanna.Framework.Graphics
         /// </summary>
         public void Use()
         {
-            GL.UseProgram(Handle);
+            GL.UseProgram(handle);
         }
 
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
-                GL.DeleteProgram(Handle);
+                GL.DeleteProgram(handle);
 
                 disposedValue = true;
             }
@@ -174,7 +174,7 @@ namespace Kanna.Framework.Graphics
         /// <returns>The location of the attribute.</returns>
         public int GetAttribLocation(string attribName)
         {
-            return GL.GetAttribLocation(Handle, attribName);
+            return GL.GetAttribLocation(handle, attribName);
         }
 
         /// <summary>
@@ -184,7 +184,7 @@ namespace Kanna.Framework.Graphics
         /// <param name="data">The data to set</param>
         public void SetInt(string name, int data)
         {
-            GL.UseProgram(Handle);
+            GL.UseProgram(handle);
             GL.Uniform1(uniformLocations[name], data);
         }
 
@@ -195,7 +195,7 @@ namespace Kanna.Framework.Graphics
         /// <param name="data">The data to set</param>
         public void SetFloat(string name, float data)
         {
-            GL.UseProgram(Handle);
+            GL.UseProgram(handle);
             GL.Uniform1(uniformLocations[name], data);
         }
 
@@ -211,7 +211,7 @@ namespace Kanna.Framework.Graphics
         /// </remarks>
         public void SetMatrix4(string name, Matrix4 data)
         {
-            GL.UseProgram(Handle);
+            GL.UseProgram(handle);
             GL.UniformMatrix4(uniformLocations[name], true, ref data);
         }
 
@@ -222,7 +222,7 @@ namespace Kanna.Framework.Graphics
         /// <param name="data">The data to set</param>
         public void SetVector3(string name, Vector3 data)
         {
-            GL.UseProgram(Handle);
+            GL.UseProgram(handle);
             GL.Uniform3(uniformLocations[name], data);
         }
     }
