@@ -4,6 +4,7 @@
     {
         X,
         Y,
-        Both
+        Both,
+        None
     }
 }
