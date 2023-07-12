@@ -1,6 +1,5 @@
 ﻿using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
-using OpenTK.Windowing.Desktop;
 
 namespace Kanna.Framework.Graphics
 {
@@ -18,6 +17,6 @@ namespace Kanna.Framework.Graphics
         public Axes RelativeSizeAxes { get; set; }
         public Anchor Anchor { get; set; }
         public Anchor Origin { get; set; }
-        public void OnRenderFrame(FrameEventArgs e, NativeWindow window);
+        public void OnRenderFrame(FrameEventArgs e, Vector2i windowSize);
     }
 }

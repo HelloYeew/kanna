@@ -1,6 +1,5 @@
 ﻿using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
-using OpenTK.Windowing.Desktop;
 
 namespace Kanna.Framework.Graphics
 {
@@ -18,26 +17,11 @@ namespace Kanna.Framework.Graphics
 
         private float[] vertices = new float[4];
 
-        public virtual void OnRenderFrame(FrameEventArgs e, NativeWindow window)
+        public virtual void OnRenderFrame(FrameEventArgs e, Vector2i windowSize)
         {
-            int windowWidth = window.Size.X;
-            int windowHeight = window.Size.Y;
-            switch (Origin)
-            {
-                case Anchor.Centre:
-                    switch (Anchor)
-                    {
-                        // Convert X and Y to the vertices
-                        // Also determine the vertices' width and height of the shape and window
-                        case Anchor.Centre:
-                            switch (RelativeSizeAxes)
-                            {
-
-                            }
-
-                    }
-
-            }
+            int windowWidth = windowSize.X;
+            int windowHeight = windowSize.Y;
+            
         }
     }
 }
