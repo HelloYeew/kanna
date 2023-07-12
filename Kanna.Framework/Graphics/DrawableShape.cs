@@ -12,6 +12,7 @@ namespace Kanna.Framework.Graphics
         public float Width { get; set; } = 0;
         public float Height { get; set; } = 0;
         public Axes RelativeSizeAxes { get; set; } = Axes.None;
+        public Axes RelativePositionAxes { get; set; } = Axes.None;
         public Anchor Anchor { get; set; } = Anchor.Centre;
         public Anchor Origin { get; set; } = Anchor.Centre;
 
@@ -21,7 +22,6 @@ namespace Kanna.Framework.Graphics
         {
             int windowWidth = windowSize.X;
             int windowHeight = windowSize.Y;
-            
         }
     }
 }

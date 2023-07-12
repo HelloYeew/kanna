@@ -15,6 +15,7 @@ namespace Kanna.Framework.Graphics
         public float Width { get; set; }
         public float Height { get; set; }
         public Axes RelativeSizeAxes { get; set; }
+        public Axes RelativePositionAxes { get; set; }
         public Anchor Anchor { get; set; }
         public Anchor Origin { get; set; }
         public void OnRenderFrame(FrameEventArgs e, Vector2i windowSize);
