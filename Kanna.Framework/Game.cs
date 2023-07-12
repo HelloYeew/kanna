@@ -49,6 +49,11 @@ namespace Kanna.Framework
         {
             base.OnRenderFrame(args);
 
+            for (int i = 0; i < Drawables.Count; i++)
+            {
+                Drawables[i].OnRenderFrame(args, Size);
+            }
+
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
             // Clear all the previous vertex array and vertex buffer
